@@ -1,0 +1,51 @@
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
+storage/chat/*
+storage/voice/*
+!storage/chat/.gitkeep
+!storage/voice/.gitkeep
+chat_history/*
+!chat_history/.gitkeep
+
+# Models and weights
+Model_training/models/*.pth
+*.weights
+*.pt
+
+# Media files
+*.mp4
+*.wav
+*.mp3
+!audio_files/**/*.mp3
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# OS specific
+.DS_Store
+Thumbs.db
