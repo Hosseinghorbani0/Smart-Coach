@@ -9,7 +9,7 @@
 [![مجوز: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![IUCAP](https://img.shields.io/badge/IUCAP-2024-purple.svg)](https://iucap.com)
 
-[EN](README.md) | [فارسی](README_FA.md)
+[English](README.md) | [فارسی](README_FA.md)
 
 </div>
 
