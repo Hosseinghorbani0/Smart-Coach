@@ -1,16 +1,3 @@
-<style>
-  .rtl-content {
-    direction: rtl;
-    text-align: right;
-  }
-  
-  .ltr-content {
-    direction: ltr;
-    text-align: left;
-  }
-</style>
-
-<div class="rtl-content">
 
 # سیستم تحلیل و مربی‌گری تمرینات ورزشی (AEACS)
 
@@ -22,7 +9,7 @@
 [![مجوز: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![IUCAP](https://img.shields.io/badge/IUCAP-2024-purple.svg)](https://iucap.com)
 
-[انگلیسی](README.md) | [فارسی](README_FA.md)
+[EN](README.md) | [فارسی](README_FA.md)
 
 </div>
 
