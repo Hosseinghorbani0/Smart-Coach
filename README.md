@@ -6,7 +6,7 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0.1-red.svg)](https://pytorch.org/)
 [![OpenCV](https://img.shields.io/badge/OpenCV-4.8.0-green.svg)](https://opencv.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![IUCAP](https://img.shields.io/badge/IUCAP-2024-purple.svg)](https://iucap.com)
+[![IUCAP](https://img.shields.io/badge/AIOCUP-2024-purple.svg)]()
 
 [English](README.md) | [فارسی](README_FA.md)
 
@@ -28,7 +28,7 @@
 ## Introduction
 
 ### Purpose
-A comprehensive real-time exercise analysis system that utilizes computer vision and machine learning for accurate form detection and coaching. Developed specifically for IUCAP competitions, this system provides frame-by-frame analysis of exercise movements with precise feedback mechanisms.
+A comprehensive real-time exercise analysis system that utilizes computer vision and machine learning for accurate form detection and coaching. Developed specifically for AIO CUP competitions, this system provides frame-by-frame analysis of exercise movements with precise feedback mechanisms.
 
 ### Background
 Traditional exercise form analysis relies heavily on human observation. This system automates this process using advanced pose estimation and movement pattern recognition, providing consistent and accurate feedback in real-time.
