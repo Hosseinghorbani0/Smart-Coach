@@ -7,7 +7,7 @@
 [![پای‌تورچ](https://img.shields.io/badge/PyTorch-2.0.1-red.svg)](https://pytorch.org/)
 [![اوپن‌سی‌وی](https://img.shields.io/badge/OpenCV-4.8.0-green.svg)](https://opencv.org/)
 [![مجوز: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![IUCAP](https://img.shields.io/badge/IUCAP-2024-purple.svg)](https://iucap.com)
+[![IUCAP](https://img.shields.io/badge/AIOCUP-2024-purple.svg)]()
 
 [English](README.md) | [فارسی](README_FA.md)
 
