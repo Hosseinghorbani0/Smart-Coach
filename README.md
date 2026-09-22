@@ -145,7 +145,7 @@ cp .env.example .env
 python main.py
 ```
 
-## Configuration
+## Configuration and usage
 
 `.env.example` is safe to commit. Copy it to `.env` and replace the placeholder value:
 
@@ -162,8 +162,6 @@ SMART_COACH_BASE_DIR=C:\Users\YourName\SmartCoachData
 ```
 
 On startup, Smart Coach creates `storage/chat` and `storage/voice` automatically.
-
-## Using the application
 
 1. Run `python main.py`.
 2. Select **تمرین کردن** from the home screen.
