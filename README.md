@@ -215,7 +215,7 @@ python -m pytest -q tests/test_detector.py
 
 The CI workflow performs a Python syntax/undefined-name check and runs the test suite. Heavy model weights, recordings, videos, secrets, and runtime storage are excluded by `.gitignore`.
 
-## Troubleshooting
+## Troubleshooting, contributing, and license
 
 ### PyQt5, MediaPipe, or audio dependency errors
 
@@ -235,6 +235,10 @@ Close other applications using the webcam, check Windows camera permissions, and
 ### The coach does not answer
 
 Check that `.env` exists, that `SMART_COACH_OPENAI_API_KEY` is set, and that the key has access to the configured OpenAI models. The key is never required for exercise detection.
+
+### Security
+
+Do not commit `.env`, API keys, personal recordings, model weights, or generated storage data. Report security issues privately through the repository security workflow instead of publishing credentials in an issue.
 
 ## Contributing
 

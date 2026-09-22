@@ -150,4 +150,32 @@ python -m pytest -q tests/test_detector.py
 
 ## خطایابی، مشارکت و مجوز
 
-راهنمای خطایابی، مشارکت و مجوز پروژه در بخش هفتم تکمیل می‌شود.
+### خطایابی
+
+اگر PyQt5، MediaPipe یا وابستگی صوتی خطا داد، فعال بودن محیط مجازی را بررسی کنید و وابستگی‌ها را دوباره نصب کنید:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+اگر دوربین باز نمی‌شود، دسترسی دوربین Windows را بررسی کنید، برنامه‌های دیگر استفاده‌کننده از دوربین را ببندید و یک ویدئوی محلی را امتحان کنید. برای مربی هوشمند نیز وجود `.env` و مقدار `SMART_COACH_OPENAI_API_KEY` را بررسی کنید.
+
+### مشارکت
+
+1. از شاخه `master` یک branch جدید بسازید.
+2. تغییرات را کوچک و متمرکز نگه دارید.
+3. برای تغییر رفتار، تست جدید اضافه کنید.
+4. قبل از Pull Request دستور `python -m pytest -q` را اجرا کنید.
+5. هیچ secret، فایل شخصی یا مدل حجیمی را commit نکنید.
+
+### مجوز و تماس
+
+این پروژه تحت [مجوز MIT](LICENSE) منتشر شده است.
+
+| مورد | اطلاعات |
+| --- | --- |
+| توسعه‌دهنده | حسین قربانی |
+| ایمیل | hosseingh1068@gmail.com |
+| وب‌سایت | [hosseinghorbani0.ir](http://hosseinghorbani0.ir) |
+| مخزن | [GitHub](https://github.com/Hosseinghorbani0/Smart-Coach) |
