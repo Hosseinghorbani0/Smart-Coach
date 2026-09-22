@@ -33,6 +33,26 @@ Smart Coach is a Windows-first Python desktop application for real-time exercise
 
 ## How it works
 
+```mermaid
+flowchart TD
+      A[Camera or local video] --> B[OpenCV frame capture]
+      B --> C[MediaPipe pose landmarks]
+      C --> D[Visibility filtering and bilateral angles]
+      D --> E[Temporal smoothing]
+      E --> F[Exercise state machine]
+      F --> G[Repetition and form result]
+      G --> H[PyQt5 training UI]
+      G --> I[Optional audio feedback]
+      J[Persian text or voice] --> K[CoachManager]
+      K --> L{OpenAI key available?}
+      L -->|Yes| M[OpenAI coach or Whisper]
+      L -->|No| N[Local setup guidance]
+```
+
+The desktop UI is split into a home screen, a training screen, and a coach screen. Runtime files are kept under `storage/`, while secrets and large media files remain outside version control.
+
+### Data flow
+
 ```text
 Camera / Video
       |
