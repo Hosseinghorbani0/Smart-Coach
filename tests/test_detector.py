@@ -29,6 +29,9 @@ def make_detector():
     detector = ExerciseDetector.__new__(ExerciseDetector)
     detector.last_angles = {}
     detector.angle_smoothing = 0.35
+    detector.start_candidate = None
+    detector.start_streak = 0
+    detector.start_confirmation_frames = 3
     return detector
 
 
@@ -52,3 +55,19 @@ def test_low_visibility_side_is_ignored():
     angles = detector.detect_key_angles(landmarks)
 
     assert angles["knee"] == pytest.approx(180.0)
+
+
+def test_start_requires_three_consecutive_candidate_frames():
+    detector = make_detector()
+
+    assert detector._confirm_start("squat") is None
+    assert detector._confirm_start("squat") is None
+    assert detector._confirm_start("squat") == "squat"
+
+
+def test_candidate_change_restarts_confirmation_streak():
+    detector = make_detector()
+
+    assert detector._confirm_start("squat") is None
+    assert detector._confirm_start("pushup") is None
+    assert detector.start_streak == 1

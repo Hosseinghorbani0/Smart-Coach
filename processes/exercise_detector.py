@@ -68,6 +68,11 @@ class ExerciseDetector:
         self.buffer_size = 32
         self.frame_buffer = []
         self.set_count = 0
+        self.start_confirmation_frames = 3
+        self.end_confirmation_frames = 3
+        self.start_candidate = None
+        self.start_streak = 0
+        self.end_streak = 0
         
         self.key_angles = {
             'pushup': {'elbow': 90},
@@ -211,15 +216,22 @@ class ExerciseDetector:
         if results.pose_landmarks:
             angles = self.detect_key_angles(results.pose_landmarks.landmark)
             
-            if angles:
+            if angles and self._angles_are_complete(angles):
                 if (angles['knee'] > 165 and not self.is_collecting):
                     self.reset_conditions()
+                    self._reset_detection_streaks()
                 
                 if auto_detect:
                     if self.is_collecting:
                         self.movement_frames.append(frame.copy())
                         
                         if self.should_end_collection(angles):
+                            self.end_streak += 1
+                        else:
+                            self.end_streak = 0
+
+                        if (self.end_streak >= self.end_confirmation_frames or
+                                len(self.movement_frames) >= self.max_frames):
                             movement_verified = self.verify_movement(self.current_exercise)
                             
                             if movement_verified:
@@ -237,38 +249,64 @@ class ExerciseDetector:
                             self.is_collecting = False
                             self.current_exercise = None
                             self.movement_frames = []
+                            self._reset_detection_streaks()
                             
                             return frame, None, self.rep_count
                         
                         return frame, f"در حال تشخیص {self.current_exercise}", self.rep_count
                     
-                    if self.check_squat_conditions(angles):
+                    candidate = self._get_exercise_candidate(angles)
+                    confirmed_candidate = self._confirm_start(candidate)
+                    if confirmed_candidate:
                         self.is_collecting = True
-                        self.current_exercise = 'squat'
+                        self.current_exercise = confirmed_candidate
                         self.movement_frames = [frame.copy()]
-                        return frame, "شروع اسکات", self.rep_count
-                    
-                    elif self.check_deadlift_conditions(angles):
-                        self.is_collecting = True
-                        self.current_exercise = 'deadlift'
-                        self.movement_frames = [frame.copy()]
-                        return frame, "شروع ددلیفت", self.rep_count
-                    
-                    elif self.check_pushup_conditions(angles):
-                        self.is_collecting = True
-                        self.current_exercise = 'pushup'
-                        self.movement_frames = [frame.copy()]
-                        return frame, "شروع پوش‌آپ", self.rep_count
-                    
-                    elif self.check_pullup_conditions(angles):
-                        self.is_collecting = True
-                        self.current_exercise = 'pullup'
-                        self.movement_frames = [frame.copy()]
-                        return frame, "شروع پول‌آپ", self.rep_count
+                        self.end_streak = 0
+                        return frame, self._start_message(confirmed_candidate), self.rep_count
             
             self.draw_feedback(frame, results.pose_landmarks, angles, self.rep_count)
         
         return frame, None, self.rep_count
+
+    @staticmethod
+    def _start_message(exercise):
+        return {
+            'squat': "شروع اسکات",
+            'deadlift': "شروع ددلیفت",
+            'pushup': "شروع پوش‌آپ",
+            'pullup': "شروع پول‌آپ"
+        }[exercise]
+
+    @staticmethod
+    def _angles_are_complete(angles):
+        return all(angles.get(name) is not None for name in ('knee', 'elbow', 'back', 'hip'))
+
+    def _get_exercise_candidate(self, angles):
+        if self.check_squat_conditions(angles):
+            return 'squat'
+        if self.check_deadlift_conditions(angles):
+            return 'deadlift'
+        if self.check_pushup_conditions(angles):
+            return 'pushup'
+        if self.check_pullup_conditions(angles):
+            return 'pullup'
+        return None
+
+    def _confirm_start(self, candidate):
+        if candidate == self.start_candidate:
+            self.start_streak += 1
+        else:
+            self.start_candidate = candidate
+            self.start_streak = 1 if candidate else 0
+
+        if candidate and self.start_streak >= self.start_confirmation_frames:
+            return candidate
+        return None
+
+    def _reset_detection_streaks(self):
+        self.start_candidate = None
+        self.start_streak = 0
+        self.end_streak = 0
 
     def should_start_collection(self, angles):
         knee_angle = angles['knee']
@@ -596,13 +634,13 @@ class ExerciseDetector:
         return model_dir 
 
     def check_squat_conditions(self, angles):
-        if 150 <= angles['hip'] <= 180:
+        if 150 <= angles.get('hip', -1) <= 180:
             self.squat_conditions['view_angle'] = True
         
-        if 75 <= angles['knee'] <= 120:
+        if 75 <= angles.get('knee', -1) <= 120:
             self.squat_conditions['knee_angle'] = True
         
-        if 150 <= angles['back'] <= 180:
+        if 150 <= angles.get('back', -1) <= 180:
             self.squat_conditions['back_angle'] = True
         
         if all(self.squat_conditions.values()):
@@ -610,13 +648,13 @@ class ExerciseDetector:
         return False
 
     def check_deadlift_conditions(self, angles):
-        if angles['knee'] < 80:
+        if angles.get('knee', 180) < 80:
             self.deadlift_conditions['knee_angle'] = True
         
-        if 110 <= angles['back'] <= 155:
+        if 110 <= angles.get('back', -1) <= 155:
             self.deadlift_conditions['back_angle'] = True
         
-        if 100 <= angles['hip'] <= 130:
+        if 100 <= angles.get('hip', -1) <= 130:
             self.deadlift_conditions['hip_angle'] = True
         
         if all(self.deadlift_conditions.values()):
@@ -624,13 +662,13 @@ class ExerciseDetector:
         return False
 
     def check_pushup_conditions(self, angles):
-        if 165 <= angles['back'] <= 180:
+        if 165 <= angles.get('back', -1) <= 180:
             self.pushup_conditions['body_position'] = True
         
-        if 160 <= angles['hip'] <= 175:
+        if 160 <= angles.get('hip', -1) <= 175:
             self.pushup_conditions['shoulder_angle'] = True
         
-        if 75 <= angles['elbow'] <= 115:
+        if 75 <= angles.get('elbow', -1) <= 115:
             self.pushup_conditions['elbow_angle'] = True
         
         if all(self.pushup_conditions.values()):
@@ -638,13 +676,13 @@ class ExerciseDetector:
         return False
 
     def check_pullup_conditions(self, angles):
-        if 165 <= angles['back'] <= 180:
+        if 165 <= angles.get('back', -1) <= 180:
             self.pullup_conditions['body_position'] = True
         
-        if 85 <= angles['elbow'] <= 110:
+        if 85 <= angles.get('elbow', -1) <= 110:
             self.pullup_conditions['elbow_angle'] = True
         
-        if -0.2 <= angles['chin_to_shoulder'] <= 0.2:
+        if -0.2 <= angles.get('chin_to_shoulder', 1) <= 0.2:
             self.pullup_conditions['chin_height'] = True
         
         if all(self.pullup_conditions.values()):
