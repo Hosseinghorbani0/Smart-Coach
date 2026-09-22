@@ -57,8 +57,9 @@ class CoachWindow(QMainWindow):
         self.CHANNELS = 1 
         self.RATE = 16000  
         
-        self.client = OpenAI(api_key=Config.OPENAI_API_KEY)
-        
+        api_key = Config.get_openai_api_key()
+        self.client = OpenAI(api_key=api_key) if api_key else None
+
         self.init_ui()
         
     def init_ui(self):
@@ -360,17 +361,20 @@ class CoachWindow(QMainWindow):
         return (in_data, pyaudio.paContinue)
     
     def process_audio(self, audio_file):
-        
+        if not self.client:
+            self.add_error_message("برای تبدیل صدای شما به متن، کلید OpenAI را در .env تنظیم کنید.")
+            return
+
         try:
             self.add_status_message("در حال تبدیل صدا به متن...")
-            
+
             with open(audio_file, 'rb') as audio:
                 transcript = self.client.audio.transcriptions.create(
                     model="whisper-1",
                     file=audio,
                     language="fa",
-                    temperature=0.3,  
-                    prompt="این یک پیام صوتی فارسی است." 
+                    temperature=0.3,
+                    prompt="این یک پیام صوتی فارسی است."
                 )
             
             try:

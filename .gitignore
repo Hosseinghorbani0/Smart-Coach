@@ -10,24 +10,25 @@ dist/
 .eggs/
 *.egg
 
+# Environment and secrets
 .env
-.venv
+.env.*
+!.env.example
+.venv/
 env/
 venv/
 ENV/
 
-# IDE
+# IDE/editor
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# Project specific
-storage/chat/*
-storage/voice/*
-!storage/chat/.gitkeep
-!storage/voice/.gitkeep
-chat_history/*
+# Project runtime data
+storage/
+!storage/.gitkeep
+chat_history/
 !chat_history/.gitkeep
 
 # Models and weights
