@@ -13,6 +13,16 @@ Smart Coach is a Windows-first Python desktop application for real-time exercise
 
 **Documentation:** [English](README.md) | [فارسی](README_FA.md)
 
+## Documentation map
+
+1. [Overview and features](#what-it-does)
+2. [Architecture and flowchart](#how-it-works)
+3. [Movement analysis](#analysis-pipeline)
+4. [Requirements and installation](#requirements)
+5. [Configuration and usage](#configuration)
+6. [Development and testing](#development-and-tests)
+7. [Troubleshooting, contributing, and license](#troubleshooting)
+
 ## What it does
 
 - Detects body landmarks from a camera stream or a local video.
