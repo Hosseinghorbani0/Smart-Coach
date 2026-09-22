@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.nn.init as init
 import numpy as np
 import cv2
+
 
 class CustomAttention(nn.Module):
     def __init__(self, in_channels):
@@ -26,6 +26,10 @@ class CustomAttention(nn.Module):
         return x
 
 class ExerciseModel(nn.Module):
+    SEQUENCE_LENGTH = 32
+    FRAME_SIZE = 64
+    FEATURE_SIZE = 2048
+
     def __init__(self, dropout_rate=0.3):
         super(ExerciseModel, self).__init__()
         
@@ -52,9 +56,10 @@ class ExerciseModel(nn.Module):
         )
         
         self.attention = CustomAttention(128)
+        self.feature_pool = nn.AdaptiveAvgPool3d((4, 4, 4))
         
         self.lstm = nn.LSTM(
-            input_size=2048,
+            input_size=self.FEATURE_SIZE,
             hidden_size=256,
             num_layers=2,
             batch_first=True,
@@ -130,8 +135,9 @@ class ExerciseModel(nn.Module):
         
         x = self.attention(x)
         
+        x = self.feature_pool(x)
         x = x.permute(0, 2, 1, 3, 4)
-        x = x.reshape(batch_size, -1, 2048)
+        x = x.flatten(start_dim=2)
         
         lstm_out, _ = self.lstm(x)
         x = lstm_out[:, -1, :]  
@@ -144,7 +150,10 @@ class ExerciseModel(nn.Module):
             'cycle': self.cycle_classifier(features)
         }
     
-    def compute_loss(self, outputs, targets, weights={'phase': 0.3, 'form': 0.5, 'cycle': 0.2}):
+    def compute_loss(self, outputs, targets, weights=None):
+        if weights is None:
+            weights = {'phase': 0.3, 'form': 0.5, 'cycle': 0.2}
+
         criterion = nn.CrossEntropyLoss(reduction='none')
         
         losses = {}
@@ -160,14 +169,18 @@ class ExerciseModel(nn.Module):
         }
 
     def predict(self, x):
+        was_training = self.training
         self.eval()
         with torch.no_grad():
             outputs = self(x)
-            return {
+            predictions = {
                 'phase': torch.softmax(outputs['phase'], dim=1),
                 'form': torch.softmax(outputs['form'], dim=1),
                 'cycle': torch.softmax(outputs['cycle'], dim=1)
             }
+        if was_training:
+            self.train()
+        return predictions
 
     def prepare_movement_input(self, frames):
         if len(frames) < 3:
@@ -175,12 +188,17 @@ class ExerciseModel(nn.Module):
             return None
         
         try:
-            indices = np.linspace(0, len(frames)-1, 32, dtype=int)
+            indices = np.linspace(
+                0,
+                len(frames) - 1,
+                self.SEQUENCE_LENGTH,
+                dtype=int
+            )
             key_frames = [frames[i] for i in indices]
             
             processed_frames = []
             for frame in key_frames:
-                frame = cv2.resize(frame, (224, 224))
+                frame = cv2.resize(frame, (self.FRAME_SIZE, self.FRAME_SIZE))
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 
                 frame = frame.astype(np.float32) / 255.0
