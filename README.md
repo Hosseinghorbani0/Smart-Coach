@@ -103,7 +103,7 @@ The current detector combines two complementary layers:
 
 The supported movement checks are intentionally conservative. Good lighting, a visible full body, and a stable side or front camera angle improve results more than increasing confidence thresholds blindly.
 
-## Requirements
+## Requirements and installation
 
 - Windows 10/11 is the primary supported platform.
 - Python 3.9 or newer. Python 3.11 is recommended for the current dependency set.
@@ -111,8 +111,6 @@ The supported movement checks are intentionally conservative. Good lighting, a v
 - A microphone only if voice features are needed.
 - At least 8 GB RAM is recommended. A GPU is optional; CPU inference is supported.
 - An OpenAI API key is optional and only required for AI chat and Whisper transcription.
-
-## Installation
 
 ### Windows PowerShell
 

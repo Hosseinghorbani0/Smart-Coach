@@ -64,7 +64,35 @@ flowchart TD
 
 ## نیازمندی‌ها و نصب
 
-راهنمای نصب Windows و Linux/macOS در بخش چهارم تکمیل می‌شود.
+نیازمندی‌های اصلی پروژه عبارت‌اند از Python 3.9 یا بالاتر، حداقل ۸ گیگابایت RAM، دوربین برای اجرای زنده و میکروفون اختیاری برای قابلیت‌های صوتی. Python 3.11 برای وابستگی فعلی پیشنهاد می‌شود.
+
+### Windows PowerShell
+
+```powershell
+git clone https://github.com/Hosseinghorbani0/Smart-Coach.git
+Set-Location Smart-Coach
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+python main.py
+```
+
+### Linux و macOS
+
+```bash
+git clone https://github.com/Hosseinghorbani0/Smart-Coach.git
+cd Smart-Coach
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+cp .env.example .env
+python main.py
+```
+
+برای اجرای زنده دوربین لازم است؛ برای تحلیل آفلاین می‌توان فایل‌های `.mp4`، `.avi` یا `.mkv` را انتخاب کرد. GPU اختیاری است و تحلیل CPU نیز پشتیبانی می‌شود.
 
 ## پیکربندی و اجرا
 
