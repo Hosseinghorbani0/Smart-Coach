@@ -90,6 +90,19 @@ The current detector combines two complementary layers:
 4. The PyTorch temporal model samples a fixed 32-frame window and uses adaptive 3D pooling before its LSTM, so different video resolutions produce a consistent feature shape.
 5. Audio feedback is optional; video analysis continues when `pygame` or audio assets are unavailable.
 
+### Movement decision rules
+
+| Stage | Purpose |
+| --- | --- |
+| Landmark confidence | Ignore joints with visibility below the detector threshold. |
+| Bilateral measurement | Average left and right knee/elbow/hip angles when available. |
+| Temporal smoothing | Reduce sudden angle jumps caused by pose-estimation noise. |
+| Start confirmation | Require three consecutive candidate frames before a movement starts. |
+| End confirmation | Require three consecutive end-state frames before a repetition is finalized. |
+| Model verification | Evaluate the captured 32-frame movement window when a trained model is available. |
+
+The supported movement checks are intentionally conservative. Good lighting, a visible full body, and a stable side or front camera angle improve results more than increasing confidence thresholds blindly.
+
 ## Requirements
 
 - Windows 10/11 is the primary supported platform.
