@@ -1,13 +1,18 @@
 import os
-from pygame import mixer
 import random
+
+try:
+    from pygame import mixer
+except ImportError:  # Audio feedback is optional for video analysis.
+    mixer = None
 
 class ExerciseAudioManager:
     def __init__(self):
         
         self.base_path ='./audio_files'
         
-        mixer.init()
+        if mixer is not None:
+            mixer.init()
         
         self.exercises = ['squat', 'pushup', 'pullup', 'deadlift']
         
@@ -23,7 +28,9 @@ class ExerciseAudioManager:
                 print(f" پوشه {exercise} وجود ندارد")
     
     def play_count(self, exercise_type, count):
-    
+        if mixer is None:
+            return
+
         if exercise_type not in self.exercises or not (1 <= count <= self.max_count):
             return
         
@@ -42,8 +49,13 @@ class ExerciseAudioManager:
             print(f"خطا ی پخش  شمارنده: {e}")
 
     def play_random_wrong_form(self):
-        
+        if mixer is None:
+            return
+
         feedback_dir = os.path.join(self.base_path, "feedback")
+        if not os.path.isdir(feedback_dir):
+            return
+
         feedback_files = [f for f in os.listdir(feedback_dir) if f.endswith('.mp3')]
         
         if feedback_files:

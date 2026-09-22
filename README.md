@@ -50,6 +50,16 @@ Chat or voice input -> CoachManager -> OpenAI (optional)
 | Pull-up | Elbow movement and chin-to-shoulder transition |
 | Deadlift | Knee, hip, and back-angle conditions |
 
+## Analysis pipeline
+
+The current detector combines two complementary layers:
+
+1. MediaPipe landmarks are filtered by visibility confidence before angles are calculated.
+2. Knee and elbow angles use both body sides when both are visible, reducing one-sided camera noise.
+3. A lightweight temporal smoother reduces unstable frame-to-frame measurements.
+4. The PyTorch temporal model samples a fixed 32-frame window and uses adaptive 3D pooling before its LSTM, so different video resolutions produce a consistent feature shape.
+5. Audio feedback is optional; video analysis continues when `pygame` or audio assets are unavailable.
+
 ## Requirements
 
 - Windows 10/11 is the primary supported platform.

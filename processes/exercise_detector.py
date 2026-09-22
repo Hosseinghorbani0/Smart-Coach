@@ -90,6 +90,7 @@ class ExerciseDetector:
         }
         
         self.last_angles = {}
+        self.angle_smoothing = 0.35
         self.angle_history = []
         self.min_frames = 10
         self.max_frames = 100
@@ -132,6 +133,44 @@ class ExerciseDetector:
             angle = 360-angle
             
         return angle
+
+    @staticmethod
+    def _is_visible(landmark, minimum_visibility=0.5):
+        return getattr(landmark, 'visibility', 1.0) >= minimum_visibility
+
+    def _calculate_landmark_angle(self, landmarks, indices):
+        points = [landmarks[index] for index in indices]
+        if not all(self._is_visible(point) for point in points):
+            return None
+
+        return self.calculate_angle(
+            [points[0].x, points[0].y],
+            [points[1].x, points[1].y],
+            [points[2].x, points[2].y]
+        )
+
+    @staticmethod
+    def _average_angles(*angles):
+        valid_angles = [angle for angle in angles if angle is not None]
+        if not valid_angles:
+            return None
+        return float(np.mean(valid_angles))
+
+    def _smooth_angles(self, angles):
+        smoothed = {}
+        for name, value in angles.items():
+            if value is None:
+                continue
+
+            previous = self.last_angles.get(name)
+            if previous is None:
+                smoothed[name] = value
+            else:
+                alpha = self.angle_smoothing
+                smoothed[name] = alpha * value + (1 - alpha) * previous
+
+        self.last_angles.update(smoothed)
+        return smoothed
     
     def detect_exercise(self, landmarks):
         elbow_angle = self.calculate_angle(
@@ -302,39 +341,35 @@ class ExerciseDetector:
 
     def detect_key_angles(self, landmarks):
         try:
-            knee_angle = self.calculate_angle(
-                [landmarks[23].x, landmarks[23].y],
-                [landmarks[25].x, landmarks[25].y],
-                [landmarks[27].x, landmarks[27].y]
+            knee_angle = self._average_angles(
+                self._calculate_landmark_angle(landmarks, (23, 25, 27)),
+                self._calculate_landmark_angle(landmarks, (24, 26, 28))
             )
-            
-            elbow_angle = self.calculate_angle(
-                [landmarks[11].x, landmarks[11].y],
-                [landmarks[13].x, landmarks[13].y],
-                [landmarks[15].x, landmarks[15].y]
+            elbow_angle = self._average_angles(
+                self._calculate_landmark_angle(landmarks, (11, 13, 15)),
+                self._calculate_landmark_angle(landmarks, (12, 14, 16))
             )
-            
-            back_angle = self.calculate_angle(
-                [landmarks[11].x, landmarks[11].y],
-                [landmarks[23].x, landmarks[23].y],
-                [landmarks[25].x, landmarks[25].y]
+            hip_angle = self._average_angles(
+                self._calculate_landmark_angle(landmarks, (11, 23, 25)),
+                self._calculate_landmark_angle(landmarks, (12, 24, 26))
             )
-            
-            hip_angle = self.calculate_angle(
-                [landmarks[11].x, landmarks[11].y],
-                [landmarks[23].x, landmarks[23].y],
-                [landmarks[25].x, landmarks[25].y]
+            back_angle = self._average_angles(
+                self._calculate_landmark_angle(landmarks, (11, 23, 25)),
+                self._calculate_landmark_angle(landmarks, (12, 24, 26))
             )
-            
-            chin_to_shoulder = landmarks[7].y - landmarks[11].y
-            
-            return {
+
+            if not self._is_visible(landmarks[7]) or not self._is_visible(landmarks[11]):
+                chin_to_shoulder = None
+            else:
+                chin_to_shoulder = landmarks[7].y - landmarks[11].y
+
+            return self._smooth_angles({
                 'knee': knee_angle,
                 'elbow': elbow_angle,
                 'back': back_angle,
                 'hip': hip_angle,
                 'chin_to_shoulder': chin_to_shoulder
-            }
+            })
         
         except Exception as e:
             return None
@@ -348,8 +383,12 @@ class ExerciseDetector:
         vertical = np.array([0, -1])
         back_vector = shoulder_mid - hip_mid
         
-        angle = np.arccos(np.dot(vertical, back_vector) / 
-                         (np.linalg.norm(vertical) * np.linalg.norm(back_vector)))
+        denominator = np.linalg.norm(vertical) * np.linalg.norm(back_vector)
+        if denominator == 0:
+            return 90.0
+
+        cosine = np.dot(vertical, back_vector) / denominator
+        angle = np.arccos(np.clip(cosine, -1.0, 1.0))
         return np.degrees(angle)
 
     def detect_exercise_type(self, angles):
