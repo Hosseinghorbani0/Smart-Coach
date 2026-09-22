@@ -197,7 +197,7 @@ Smart-Coach/
 └── tests/                          # Regression tests
 ```
 
-## Development and tests
+## Development and testing
 
 Activate the virtual environment, then run:
 
@@ -205,7 +205,15 @@ Activate the virtual environment, then run:
 python -m pytest -q
 ```
 
-The CI workflow also performs a Python syntax/undefined-name check and runs the test suite. Heavy model weights, recordings, videos, secrets, and runtime storage are excluded by `.gitignore`.
+Focused checks are also available:
+
+```bash
+python -m pytest -q tests/test_config.py
+python -m pytest -q tests/test_model.py
+python -m pytest -q tests/test_detector.py
+```
+
+The CI workflow performs a Python syntax/undefined-name check and runs the test suite. Heavy model weights, recordings, videos, secrets, and runtime storage are excluded by `.gitignore`.
 
 ## Troubleshooting
 

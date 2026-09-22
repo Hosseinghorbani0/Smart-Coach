@@ -122,7 +122,31 @@ SMART_COACH_BASE_DIR=C:\Users\YourName\SmartCoachData
 
 ## توسعه و تست
 
-دستورهای تست و ساختار کد در بخش ششم تکمیل می‌شود.
+ساختار اصلی کد به این شکل است:
+
+```text
+core/             تنظیمات، مربی هوشمند، صدا و تاریخچه چت
+processes/        تشخیص حرکت، مدل PyTorch و بازخورد صوتی
+ui/               صفحه خانه، تمرین، مربی و ضبط صدا
+Model_training/   دیتاست و ابزارهای آموزش مدل
+tests/            تست‌های پیکربندی، مدل و detector
+```
+
+برای اجرای همه تست‌ها:
+
+```bash
+python -m pytest -q
+```
+
+برای تست بخش‌های مشخص:
+
+```bash
+python -m pytest -q tests/test_config.py
+python -m pytest -q tests/test_model.py
+python -m pytest -q tests/test_detector.py
+```
+
+فرآیند CI نیز syntax پایتون، نام‌های تعریف‌نشده و تست‌ها را بررسی می‌کند.
 
 ## خطایابی، مشارکت و مجوز
 
